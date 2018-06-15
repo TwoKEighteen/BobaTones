@@ -1,17 +1,66 @@
 //Tone.js code
 
-//effects chain
+//mixer
+var limiter = new Tone.Limiter(-6)
+var gain = new Tone.Gain(0.5)
 
+//effects chain
 const reverb = new Tone.Reverb({
-  decay: 1,
+  decay: 3,
   preDelay: 0.01
 }).toMaster()
 reverb.decay = reverb.generate()
 
-const pingPongDelay = new Tone.PingPongDelay()
+const pingPongDelay = new Tone.PingPongDelay({
+  delayTime: '8n',
+  feedback: 0.6,
+  wet: 0.5
+}).toMaster()
+
+//arpegiator
+Tone.Transport.bpm.value = 100
+
+var notes = ['C4', 'E4', 'G4', 'B4']
+var current_note = 0
+
+var synth = new Tone.DuoSynth()
+
+synth.connect(gain)
+gain.toMaster()
+
+synth.voice0.oscillator.type = 'triangle'
+synth.voice1.oscillator.type = 'triangle'
+
+const arpLoop = new Tone.Loop(function(time) {
+  var note = notes[current_note % notes.length]
+  synth.triggerAttackRelease(note, '16n', time)
+  current_note++
+}, '16n').start(0)
+
+Tone.Transport.start()
 
 //synth code
-const synthParams = {
+const synthAParams = {
+  oscillator: {
+    type: 'sine'
+  },
+  envelope: {
+    attack: 0.005,
+    decay: 0.3,
+    sustain: 0.4,
+    release: 0.8
+  },
+  filterEnvelope: {
+    attack: 0.001,
+    decay: 0.7,
+    sustain: 0.1,
+    release: 0.8,
+    baseFrequency: 300,
+    octaves: 4
+  }
+}
+
+const synthBParams = {
   oscillator: {
     type: 'sine',
     count: 3,
@@ -27,17 +76,23 @@ const synthParams = {
 }
 
 function synthA() {
-  this.synth = new Tone.Synth(synthParams).toMaster()
+  this.synth = new Tone.Synth(synthAParams).toMaster()
   this.noteIndex = 0
-  this.notes = ['D4', 'A4', 'E4', 'B4', 'F#4', 'C#4', 'G#4']
+  this.notes = ['D4', 'A4', 'E4']
+}
+
+function synthB() {
+  this.synth = new Tone.Synth(synthBParams).toMaster()
+  this.noteIndex = 0
+  this.notes = ['D4', 'A4', 'E4']
 }
 
 synthA.prototype = {
   play() {
     const note = this.notes[this.noteIndex]
     this.noteIndex = Math.floor(Math.random() * this.notes.length)
-    this.synth.triggerAttackRelease(note, '4n').connect(pingPongDelay)
-    console.log(note, this.noteIndex)
+    this.synth.triggerAttackRelease(note, '4n').connect(reverb)
+    //console.log(note, this.noteIndex)
   }
 }
 
@@ -141,8 +196,7 @@ window.onload = function() {
         b.calcBounds(this)
         this.updateBounds()
         b.updateBounds()
-        //testSynth.play()
-        //sampler.triggerAttack('C4')
+        testSynth.play()
       }
     },
 
@@ -180,6 +234,7 @@ window.onload = function() {
 
   paper.view.onClick = function() {
     if (balls.length === 20) return
+    sampler.triggerAttack('C4')
     for (let i = 0; i < numBalls; i++) {
       const position = paper.Point.random().multiply(paper.view.size)
       const vector = new paper.Point({
