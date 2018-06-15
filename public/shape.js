@@ -186,7 +186,7 @@ window.onload = function() {
 
     react(b) {
       const dist = this.point.getDistance(b.point)
-      if (dist < this.radius + b.radius && dist != 0) {
+      if (dist < this.radius + b.radius && dist !== 0) {
         const overlap = this.radius + b.radius - dist
         const direc = this.point.subtract(b.point).normalize(overlap * 0.015)
         this.vector = this.vector.add(direc)
@@ -230,13 +230,13 @@ window.onload = function() {
   }
 
   const balls = []
-  let numBalls = 1
+  const numBalls = 1
 
-  paper.view.onClick = function() {
+  paper.view.onClick = function(event) {
     if (balls.length === 20) return
     sampler.triggerAttack('C4')
     for (let i = 0; i < numBalls; i++) {
-      const position = paper.Point.random().multiply(paper.view.size)
+      const position = event.point
       const vector = new paper.Point({
         angle: Math.floor(360 * Math.random()),
         length: Math.floor(Math.random() * 10)
@@ -246,23 +246,21 @@ window.onload = function() {
     }
   }
 
-  const mouse = new paper.Path.Circle({
-    center: [0, 0],
-    radius: 20,
-    fillColor: 'black'
-  })
+  // const tool = new paper.Tool()
+  // tool.onMouseMove = (event) => event.point
+  // console.log(tool.onMouseMove);
 
-  let tool = new paper.Tool()
-
-  tool.onMouseMove = function(event) {
-    mouse.position = event.point
-  }
+  // const mouse = new Ball(1, pos, vector = new paper.Point({
+  //   angle: Math.floor(360 * Math.random()),
+  //   length: Math.floor(Math.random() * 10),
+  // }))
 
   paper.view.onFrame = function() {
+    // mouse.iterate()
     for (var i = 0; i < balls.length - 1; i++) {
       for (let j = i + 1; j < balls.length; j++) {
         balls[i].react(balls[j])
-        balls[i].react(mouse)
+        // balls[i].react(mouse)
       }
     }
     for (var i = 0, l = balls.length; i < l; i++) {
