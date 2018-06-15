@@ -7,7 +7,7 @@ window.onload = function() {
     this.point = p
     this.vector = v
     this.maxVec = 5
-    this.numSegment = Math.floor(r / 3 + 2)
+    this.numSegment = 50
     this.boundOffset = []
     this.boundOffsetBuff = []
     this.sidePoints = []
@@ -125,21 +125,38 @@ window.onload = function() {
   }
 
   const balls = []
-  const numBalls = 10
-  for (let i = 0; i < numBalls; i++) {
-    const position = paper.Point.random().multiply(paper.view.size)
-    const vector = new paper.Point({
-      angle: Math.floor(360 * Math.random()),
-      length: Math.floor(Math.random() * 10)
-    })
-    const radius = Math.random() * 60 + 60
-    balls.push(new Ball(radius, position, vector))
+  let numBalls = 1
+
+  paper.view.onClick = function() {
+    if (balls.length === 20) return
+    for (let i = 0; i < numBalls; i++) {
+      const position = paper.Point.random().multiply(paper.view.size)
+      const vector = new paper.Point({
+        angle: Math.floor(360 * Math.random()),
+        length: Math.floor(Math.random() * 10)
+      })
+      const radius = Math.random() * 60 + 30
+      balls.push(new Ball(radius, position, vector))
+    }
+  }
+
+  const mouse = new paper.Path.Circle({
+    center: [0, 0],
+    radius: 20,
+    fillColor: 'black'
+  })
+
+  let tool = new paper.Tool()
+
+  tool.onMouseMove = function(event) {
+    mouse.position = event.point
   }
 
   paper.view.onFrame = function() {
     for (var i = 0; i < balls.length - 1; i++) {
       for (let j = i + 1; j < balls.length; j++) {
         balls[i].react(balls[j])
+        balls[i].react(mouse)
       }
     }
     for (var i = 0, l = balls.length; i < l; i++) {
