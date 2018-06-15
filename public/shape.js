@@ -1,3 +1,52 @@
+//Tone.js code
+
+//effects chain
+
+const reverb = new Tone.Reverb({
+  decay: 1,
+  preDelay: 0.01
+}).toMaster()
+reverb.decay = reverb.generate()
+
+const pingPongDelay = new Tone.PingPongDelay()
+
+//synth code
+const synthParams = {
+  oscillator: {
+    type: 'sine',
+    count: 3,
+    spread: 30
+  },
+  envelope: {
+    attack: 0.5,
+    decay: 0.1,
+    sustain: 0.05,
+    release: 0.5,
+    attackCurve: 'exponential'
+  }
+}
+
+function synthA() {
+  this.synth = new Tone.Synth(synthParams).toMaster()
+  this.noteIndex = 0
+  this.notes = ['D4', 'A4', 'E4', 'B4', 'F#4', 'C#4', 'G#4']
+}
+
+synthA.prototype = {
+  play() {
+    const note = this.notes[this.noteIndex]
+    this.noteIndex = Math.floor(Math.random() * this.notes.length)
+    this.synth.triggerAttackRelease(note, '4n').connect(pingPongDelay)
+    console.log(note, this.noteIndex)
+  }
+}
+
+const testSynth = new synthA()
+
+//sampler
+const sampler = new Tone.Sampler({C4: 'pop.mp3'}).toMaster()
+
+//Paper.js code
 window.onload = function() {
   const canvas = this.document.getElementById('myCanvas')
   paper.setup(canvas)
@@ -92,6 +141,8 @@ window.onload = function() {
         b.calcBounds(this)
         this.updateBounds()
         b.updateBounds()
+        //testSynth.play()
+        //sampler.triggerAttack('C4')
       }
     },
 
@@ -125,7 +176,7 @@ window.onload = function() {
   }
 
   const balls = []
-  const numBalls = 10
+  const numBalls = 4
   for (let i = 0; i < numBalls; i++) {
     const position = paper.Point.random().multiply(paper.view.size)
     const vector = new paper.Point({
