@@ -111,7 +111,7 @@ window.onload = function() {
     this.point = p
     this.vector = v
     this.maxVec = 5
-    this.numSegment = 50
+    this.numSegment = 100
     this.boundOffset = []
     this.boundOffsetBuff = []
     this.sidePoints = []
@@ -191,12 +191,20 @@ window.onload = function() {
           saturation: 1,
           brightness: 1
         }
-
+        b.path.fillColor = {
+          hue: Math.random() * 360,
+          saturation: 1,
+          brightness: 1
+        }
         this.calcBounds(b)
         b.calcBounds(this)
         this.updateBounds()
         b.updateBounds()
         testSynth.play()
+      }
+      if (dist > this.radius + b.radius && dist !== 0) {
+        this.path.fillColor = {}
+        b.path.fillColor = {}
       }
     },
 
@@ -253,11 +261,9 @@ window.onload = function() {
   // }))
 
   paper.view.onFrame = function() {
-    // mouse.iterate()
     for (var i = 0; i < bobas.length - 1; i++) {
       for (let j = i + 1; j < bobas.length; j++) {
         bobas[i].react(bobas[j])
-        // balls[i].react(mouse)
       }
     }
     for (var i = 0, l = bobas.length; i < l; i++) {
