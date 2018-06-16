@@ -1,10 +1,10 @@
-//Tone.js code
+// Tone.js code
 
 //mixer
 var limiter = new Tone.Limiter(-6)
 var gain = new Tone.Gain(0.2)
 
-//effects chain
+// effects chain
 const reverb = new Tone.Reverb({
   decay: 1,
   preDelay: 0.01
@@ -17,7 +17,7 @@ const pingPongDelay = new Tone.PingPongDelay({
   wet: 0.5
 }).toMaster()
 
-//arpegiator
+// arpegiator
 Tone.Transport.bpm.value = 100
 
 const notes = ['C4', 'E4', 'G4', 'B4']
@@ -38,7 +38,7 @@ const arpLoop = new Tone.Loop(function(time) {
 
 Tone.Transport.start()
 
-//synth code
+// synth code
 const synthAParams = {
   oscillator: {
     type: 'sine'
@@ -69,7 +69,7 @@ synthA.prototype = {
 
 const testSynth = new synthA()
 
-//sampler
+// sampler
 const sampler = new Tone.Sampler({C4: 'pop.mp3'}).toMaster()
 
 limiter.toMaster()
@@ -79,22 +79,17 @@ window.onload = function() {
   const canvas = this.document.getElementById('myCanvas')
   paper.setup(canvas)
 
-  function Ball(r, p, v) {
+  function Boba(r, p, v) {
     this.radius = r
     this.point = p
     this.vector = v
     this.maxVec = 5
-    this.numSegment = 50
+    this.numSegment = 100
     this.boundOffset = []
     this.boundOffsetBuff = []
     this.sidePoints = []
     this.path = new paper.Path({
-      fillColor: {
-        hue: Math.random() * 360,
-        saturation: 1,
-        brightness: 0
-      },
-      blendMode: 'lighter'
+      fillColor: {}
     })
 
     for (let i = 0; i < this.numSegment; i++) {
@@ -110,7 +105,7 @@ window.onload = function() {
     }
   }
 
-  Ball.prototype = {
+  Boba.prototype = {
     iterate() {
       this.checkBorders()
       if (this.vector.length > this.maxVec) {
@@ -164,12 +159,25 @@ window.onload = function() {
         const direc = this.point.subtract(b.point).normalize(overlap * 0.015)
         this.vector = this.vector.add(direc)
         b.vector = b.vector.subtract(direc)
-
+        this.path.fillColor = {
+          hue: Math.random() * 360,
+          saturation: 1,
+          brightness: 1
+        }
+        b.path.fillColor = {
+          hue: Math.random() * 360,
+          saturation: 1,
+          brightness: 1
+        }
         this.calcBounds(b)
         b.calcBounds(this)
         this.updateBounds()
         b.updateBounds()
         testSynth.play()
+      }
+      if (dist > this.radius + b.radius && dist !== 0) {
+        this.path.fillColor = {}
+        b.path.fillColor = {}
       }
     },
 
@@ -202,21 +210,18 @@ window.onload = function() {
     }
   }
 
-  const balls = []
-  const numBalls = 1
+  const bobas = []
 
   paper.view.onClick = function(event) {
-    if (balls.length === 10) return
+    if (bobas.length >= 10) return
     sampler.triggerAttack('C4')
-    for (let i = 0; i < numBalls; i++) {
-      const position = event.point
-      const vector = new paper.Point({
-        angle: Math.floor(360 * Math.random()),
-        length: Math.floor(Math.random() * 10)
-      })
-      const radius = Math.random() * 60 + 30
-      balls.push(new Ball(radius, position, vector))
-    }
+    const position = event.point
+    const vector = new paper.Point({
+      angle: Math.floor(360 * Math.random()),
+      length: Math.floor(Math.random() * 10)
+    })
+    const radius = Math.random() * 60 + 30
+    bobas.push(new Boba(radius, position, vector))
   }
 
   // const tool = new paper.Tool()
@@ -229,15 +234,13 @@ window.onload = function() {
   // }))
 
   paper.view.onFrame = function() {
-    // mouse.iterate()
-    for (var i = 0; i < balls.length - 1; i++) {
-      for (let j = i + 1; j < balls.length; j++) {
-        balls[i].react(balls[j])
-        // balls[i].react(mouse)
+    for (var i = 0; i < bobas.length - 1; i++) {
+      for (let j = i + 1; j < bobas.length; j++) {
+        bobas[i].react(bobas[j])
       }
     }
-    for (var i = 0, l = balls.length; i < l; i++) {
-      balls[i].iterate()
+    for (var i = 0, l = bobas.length; i < l; i++) {
+      bobas[i].iterate()
     }
   }
 }
