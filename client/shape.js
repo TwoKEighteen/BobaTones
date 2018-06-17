@@ -46,7 +46,9 @@ const arpLoop = new Tone.Loop(function(time) {
 }, '16n').start(0)
 
 //start 8-bit melody
-//Tone.Transport.start()
+export function startTone() {
+  Tone.Transport.start()
+}
 
 function melodyOnClick() {
   status === 'off' ? Tone.Transport.start() : Tone.Transport.stop()
