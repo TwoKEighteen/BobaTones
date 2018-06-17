@@ -2,7 +2,7 @@
 
 //mixer
 const limiter = new Tone.Limiter(-12)
-const gain = new Tone.Gain(0.2)
+const gain = new Tone.Gain(0.1)
 
 // effects chain
 const reverb = new Tone.Reverb({
@@ -45,7 +45,22 @@ const arpLoop = new Tone.Loop(function(time) {
   melody_current_note++
 }, '16n').start(0)
 
-Tone.Transport.start()
+//start 8-bit melody
+//Tone.Transport.start()
+
+function melodyOnClick() {
+  status === 'off' ? Tone.Transport.start() : Tone.Transport.stop()
+}
+
+//make and start player
+const player = new Tone.Player({
+  url: 'AUDIO PATH',
+  loop: true
+}).toMaster()
+
+function musicOnClick() {
+  status === 'off' ? player.start() : player.stop()
+}
 
 // synth code
 const bubbleParams = {
@@ -83,8 +98,8 @@ const sampler = new Tone.Sampler({C4: 'pop.mp3'}).toMaster()
 limiter.toMaster()
 
 //Paper.js code
-window.onload = function() {
-  const canvas = this.document.getElementById('myCanvas')
+export function bobaFunc() {
+  const canvas = window.document.getElementById('myCanvas')
   paper.setup(canvas)
 
   function Boba(r, p, v) {
