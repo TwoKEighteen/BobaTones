@@ -1,73 +1,81 @@
 // Tone.js code
 
 //mixer
-var limiter = new Tone.Limiter(-6)
-var gain = new Tone.Gain(0.2)
+const limiter = new Tone.Limiter(-12)
+const gain = new Tone.Gain(0.2)
 
 // effects chain
 const reverb = new Tone.Reverb({
-  decay: 1,
-  preDelay: 0.01
+  decay: 2,
+  preDelay: 0.9
 }).toMaster()
 reverb.decay = reverb.generate()
 
 const pingPongDelay = new Tone.PingPongDelay({
-  delayTime: '16n',
-  feedback: 0.5,
+  delayTime: '8n',
+  feedback: 0.6,
   wet: 0.5
 }).toMaster()
 
 // arpegiator
-Tone.Transport.bpm.value = 100
+Tone.Transport.bpm.value = 90
 
 const notes = ['C4', 'E4', 'G4', 'B4']
-
 let current_note = 0
-
 const synth = new Tone.DuoSynth()
 synth.connect(gain)
 gain.toMaster()
 synth.voice0.oscillator.type = 'triangle'
 synth.voice1.oscillator.type = 'triangle'
 
+const melodyNotes = ['C4', 'E4', 'G4', 'B4', 'C5', 'E4', 'A4']
+let melody_current_note = 0
+const melodySynth = new Tone.DuoSynth()
+melodySynth.connect(gain)
+melodySynth.voice0.oscillator.type = 'triangle'
+melodySynth.voice1.oscillator.type = 'triangle'
+
 const arpLoop = new Tone.Loop(function(time) {
-  var note = notes[current_note % notes.length]
-  synth.triggerAttackRelease(note, '32n', time)
+  let synthNote = notes[current_note % notes.length]
+  synth.triggerAttackRelease(synthNote, '4n', time)
   current_note++
+
+  let melodyNote = notes[melody_current_note % melodyNotes.length]
+  melodySynth.triggerAttackRelease(melodyNote, '1n', time)
+  melody_current_note++
 }, '16n').start(0)
 
 Tone.Transport.start()
 
 // synth code
-const synthAParams = {
+const bubbleParams = {
   oscillator: {
     type: 'sine'
   },
   envelope: {
-    attack: 0.09,
-    decay: 0.09,
+    attack: 0.01,
+    decay: 0.9,
     sustain: 0.5,
-    release: 0.09
+    release: 0.9
   },
   portamento: 0.08
 }
 
-function synthA() {
-  this.synth = new Tone.Synth(synthAParams).toMaster()
+function BobaBoing() {
+  this.synth = new Tone.Synth(bubbleParams).toMaster()
   this.currentNote = 0
-  this.notes = ['C1', 'B5']
+  this.notes = ['C1', 'B4']
 }
 
-synthA.prototype = {
+BobaBoing.prototype = {
   play() {
     const note = this.notes[this.currentNote % this.notes.length]
     this.synth.triggerAttackRelease(note, '32n').fan(pingPongDelay, reverb)
     this.currentNote++
-    console.log(this.currentNote)
   }
 }
 
-const testSynth = new synthA()
+const bobaBoing = new BobaBoing()
 
 // sampler
 const sampler = new Tone.Sampler({C4: 'pop.mp3'}).toMaster()
@@ -173,7 +181,7 @@ window.onload = function() {
         b.calcBounds(this)
         this.updateBounds()
         b.updateBounds()
-        testSynth.play()
+        bobaBoing.play()
       }
       if (dist > this.radius + b.radius && dist !== 0) {
         this.path.fillColor = {}
