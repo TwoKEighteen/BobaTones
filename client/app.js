@@ -1,5 +1,6 @@
 import React, {Component} from 'react'
 import {Header, Button, Image, Grid, Icon} from 'semantic-ui-react'
+import {startTone} from './shape'
 import BobaStuff from './Boba'
 
 class App extends Component {
@@ -14,6 +15,7 @@ class App extends Component {
     this.setState({
       start: true
     })
+    startTone()
   }
 
   render() {
