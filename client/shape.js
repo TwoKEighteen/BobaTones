@@ -46,25 +46,33 @@ const arpLoop = new Tone.Loop(function(time) {
   melody_current_note++
 }, '16n').start(0)
 
+const psychPlayer = new Tone.Player({
+  url: 'bensound-psychedelic.mp3',
+  loop: true
+}).toMaster()
+
+const happyPlayer = new Tone.Player({
+  url: 'bensound-buddy.mp3',
+  loop: true
+}).toMaster()
+
 //start 8-bit melody
 export function startTone() {
   Tone.Transport.start()
 }
 
-function melodyOnClick() {
-  status === 'off' ? Tone.Transport.start() : Tone.Transport.stop()
+export function stopAudio() {
+  Tone.Transport.stop()
+  psychPlayer.stop()
+  happyPlayer.stop()
 }
+
 //start music
-function musicOnClick() {
-  status === 'off' ? player.start() : player.stop()
+export function musicStart(key) {
+  if (key === 'psych-rock') psychPlayer.start()
+  if (key === 'happy') happyPlayer.start()
+  if (key === 'synth') Tone.Transport.start()
 }
-
-const player = new Tone.Player({
-  url: 'bensound-psychedelic.mp3',
-  loop: true
-}).toMaster()
-
-export const startMusic = () => player.start()
 
 // synth code
 const bubbleParams = {
