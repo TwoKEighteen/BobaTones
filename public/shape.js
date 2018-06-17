@@ -1,13 +1,13 @@
 // Tone.js code
 
-// mixer
-const limiter = new Tone.Limiter(-6)
-const gain = new Tone.Gain(0.5)
+//mixer
+const limiter = new Tone.Limiter(-12)
+const gain = new Tone.Gain(0.2)
 
 // effects chain
 const reverb = new Tone.Reverb({
-  decay: 3,
-  preDelay: 0.01
+  decay: 2,
+  preDelay: 0.9
 }).toMaster()
 reverb.decay = reverb.generate()
 
@@ -18,90 +18,71 @@ const pingPongDelay = new Tone.PingPongDelay({
 }).toMaster()
 
 // arpegiator
-Tone.Transport.bpm.value = 100
+Tone.Transport.bpm.value = 90
 
 const notes = ['C4', 'E4', 'G4', 'B4']
 let current_note = 0
-
 const synth = new Tone.DuoSynth()
-
 synth.connect(gain)
 gain.toMaster()
-
 synth.voice0.oscillator.type = 'triangle'
 synth.voice1.oscillator.type = 'triangle'
 
-const arpLoop = new Tone.Loop(time => {
-  const note = notes[current_note % notes.length]
-  synth.triggerAttackRelease(note, '16n', time)
+const melodyNotes = ['C4', 'E4', 'G4', 'B4', 'C5', 'E4', 'A4']
+let melody_current_note = 0
+const melodySynth = new Tone.DuoSynth()
+melodySynth.connect(gain)
+melodySynth.voice0.oscillator.type = 'triangle'
+melodySynth.voice1.oscillator.type = 'triangle'
+
+const arpLoop = new Tone.Loop(function(time) {
+  let synthNote = notes[current_note % notes.length]
+  synth.triggerAttackRelease(synthNote, '4n', time)
   current_note++
+
+  let melodyNote = notes[melody_current_note % melodyNotes.length]
+  melodySynth.triggerAttackRelease(melodyNote, '1n', time)
+  melody_current_note++
 }, '16n').start(0)
 
 Tone.Transport.start()
 
 // synth code
-const synthAParams = {
+const bubbleParams = {
   oscillator: {
     type: 'sine'
   },
   envelope: {
-    attack: 0.005,
-    decay: 0.3,
-    sustain: 0.4,
-    release: 0.8
+    attack: 0.01,
+    decay: 0.9,
+    sustain: 0.5,
+    release: 0.9
   },
-  filterEnvelope: {
-    attack: 0.001,
-    decay: 0.7,
-    sustain: 0.1,
-    release: 0.8,
-    baseFrequency: 300,
-    octaves: 4
-  }
+  portamento: 0.08
 }
 
-const synthBParams = {
-  oscillator: {
-    type: 'sine',
-    count: 3,
-    spread: 30
-  },
-  envelope: {
-    attack: 0.5,
-    decay: 0.1,
-    sustain: 0.05,
-    release: 0.5,
-    attackCurve: 'exponential'
-  }
+function BobaBoing() {
+  this.synth = new Tone.Synth(bubbleParams).toMaster()
+  this.currentNote = 0
+  this.notes = ['C1', 'B4']
 }
 
-function synthA() {
-  this.synth = new Tone.Synth(synthAParams).toMaster()
-  this.noteIndex = 0
-  this.notes = ['D4', 'A4', 'E4']
-}
-
-function synthB() {
-  this.synth = new Tone.Synth(synthBParams).toMaster()
-  this.noteIndex = 0
-  this.notes = ['D4', 'A4', 'E4']
-}
-
-synthA.prototype = {
+BobaBoing.prototype = {
   play() {
-    const note = this.notes[this.noteIndex]
-    this.noteIndex = Math.floor(Math.random() * this.notes.length)
-    this.synth.triggerAttackRelease(note, '4n').connect(reverb)
-    // console.log(note, this.noteIndex)
+    const note = this.notes[this.currentNote % this.notes.length]
+    this.synth.triggerAttackRelease(note, '32n').fan(pingPongDelay, reverb)
+    this.currentNote++
   }
 }
 
-const testSynth = new synthA()
+const bobaBoing = new BobaBoing()
 
 // sampler
 const sampler = new Tone.Sampler({C4: 'pop.mp3'}).toMaster()
 
-// Paper.js code
+limiter.toMaster()
+
+//Paper.js code
 window.onload = function() {
   const canvas = this.document.getElementById('myCanvas')
   paper.setup(canvas)
@@ -200,7 +181,7 @@ window.onload = function() {
         b.calcBounds(this)
         this.updateBounds()
         b.updateBounds()
-        testSynth.play()
+        bobaBoing.play()
       }
       if (dist > this.radius + b.radius && dist !== 0) {
         this.path.fillColor = {}
