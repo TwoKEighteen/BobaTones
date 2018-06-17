@@ -1,4 +1,5 @@
 // Tone.js code
+//music copyright --> Music: « bensound-psychedelic » from Bensound.com
 
 //mixer
 const limiter = new Tone.Limiter(-12)
@@ -45,23 +46,32 @@ const arpLoop = new Tone.Loop(function(time) {
   melody_current_note++
 }, '16n').start(0)
 
+const psychPlayer = new Tone.Player({
+  url: 'bensound-psychedelic.mp3',
+  loop: true
+}).toMaster()
+
+const happyPlayer = new Tone.Player({
+  url: 'bensound-buddy.mp3',
+  loop: true
+}).toMaster()
+
 //start 8-bit melody
 export function startTone() {
   Tone.Transport.start()
 }
 
-function melodyOnClick() {
-  status === 'off' ? Tone.Transport.start() : Tone.Transport.stop()
+export function stopAudio() {
+  Tone.Transport.stop()
+  psychPlayer.stop()
+  happyPlayer.stop()
 }
 
-//make and start player
-const player = new Tone.Player({
-  url: 'AUDIO PATH',
-  loop: true
-}).toMaster()
-
-function musicOnClick() {
-  status === 'off' ? player.start() : player.stop()
+//start music
+export function musicStart(key) {
+  if (key === 'psych-rock') psychPlayer.start()
+  if (key === 'happy') happyPlayer.start()
+  if (key === 'synth') Tone.Transport.start()
 }
 
 // synth code
@@ -81,7 +91,7 @@ const bubbleParams = {
 function BobaBoing() {
   this.synth = new Tone.Synth(bubbleParams).toMaster()
   this.currentNote = 0
-  this.notes = ['C1', 'B4']
+  this.notes = ['C1', 'C4']
 }
 
 BobaBoing.prototype = {
@@ -97,6 +107,7 @@ const bobaBoing = new BobaBoing()
 // sampler
 const sampler = new Tone.Sampler({C4: 'pop.mp3'}).toMaster()
 
+//limit all outgoing audio
 limiter.toMaster()
 
 //Paper.js code
