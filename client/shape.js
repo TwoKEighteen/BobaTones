@@ -1,11 +1,11 @@
 // Tone.js code
-//music copyright --> Music: « bensound-psychedelic » from Bensound.com
+// music copyright --> Music: « bensound-psychedelic » from Bensound.com
 
-//mixer
+// Mixer
 const limiter = new Tone.Limiter(-12)
 const gain = new Tone.Gain(0.1)
 
-// effects chain
+// Effects chain
 const reverb = new Tone.Reverb({
   decay: 2,
   preDelay: 0.9
@@ -18,7 +18,7 @@ const pingPongDelay = new Tone.PingPongDelay({
   wet: 0.5
 }).toMaster()
 
-// arpegiator
+// Arpeggiator
 Tone.Transport.bpm.value = 90
 
 const notes = ['C4', 'E4', 'G4', 'B4']
@@ -36,12 +36,12 @@ melodySynth.connect(gain)
 melodySynth.voice0.oscillator.type = 'triangle'
 melodySynth.voice1.oscillator.type = 'triangle'
 
-const arpLoop = new Tone.Loop(function(time) {
-  let synthNote = notes[current_note % notes.length]
+const arpLoop = new Tone.Loop(time => {
+  const synthNote = notes[current_note % notes.length]
   synth.triggerAttackRelease(synthNote, '4n', time)
   current_note++
 
-  let melodyNote = notes[melody_current_note % melodyNotes.length]
+  const melodyNote = notes[melody_current_note % melodyNotes.length]
   melodySynth.triggerAttackRelease(melodyNote, '1n', time)
   melody_current_note++
 }, '16n').start(0)
@@ -56,7 +56,7 @@ const happyPlayer = new Tone.Player({
   loop: true
 }).toMaster()
 
-//start 8-bit melody
+// Start 8-bit melody
 export function startTone() {
   Tone.Transport.start()
 }
@@ -67,14 +67,14 @@ export function stopAudio() {
   happyPlayer.stop()
 }
 
-//start music
+// Start music
 export function musicStart(key) {
   if (key === 'psych-rock') psychPlayer.start()
   if (key === 'happy') happyPlayer.start()
   if (key === 'synth') Tone.Transport.start()
 }
 
-// synth code
+// Synth code
 const bubbleParams = {
   oscillator: {
     type: 'sine'
@@ -104,13 +104,13 @@ BobaBoing.prototype = {
 
 const bobaBoing = new BobaBoing()
 
-// sampler
+// Sampler
 const sampler = new Tone.Sampler({C4: 'pop.mp3'}).toMaster()
 
-//limit all outgoing audio
+// Limit all outgoing audio
 limiter.toMaster()
 
-//Paper.js code
+// Paper.js code
 export function bobaFunc() {
   const canvas = window.document.getElementById('myCanvas')
   paper.setup(canvas)
@@ -259,15 +259,6 @@ export function bobaFunc() {
     const radius = Math.random() * 60 + 30
     bobas.push(new Boba(radius, position, vector))
   }
-
-  // const tool = new paper.Tool()
-  // tool.onMouseMove = (event) => event.point
-  // console.log(tool.onMouseMove);
-
-  // const mouse = new Ball(1, pos, vector = new paper.Point({
-  //   angle: Math.floor(360 * Math.random()),
-  //   length: Math.floor(Math.random() * 10),
-  // }))
 
   paper.view.onFrame = function() {
     for (var i = 0; i < bobas.length - 1; i++) {
