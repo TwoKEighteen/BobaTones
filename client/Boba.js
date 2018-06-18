@@ -35,8 +35,3 @@ class BobaCanvas extends Component {
 }
 
 export default BobaCanvas
-
-// <div>
-//   <button>Play Appegiator</button>
-//   <button>Play Music</button>
-// </div>
