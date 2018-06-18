@@ -247,11 +247,10 @@ export function bobaFunc() {
   }
 
   const bobas = []
+  const num = 5
 
-  paper.view.onClick = function(event) {
-    if (bobas.length >= 10) return
-    sampler.triggerAttack('C4')
-    const position = event.point
+  for (let i = 0; i < num; i++) {
+    const position = paper.Point.random().multiply(paper.view.size)
     const vector = new paper.Point({
       angle: Math.floor(360 * Math.random()),
       length: Math.floor(Math.random() * 10)
@@ -259,7 +258,6 @@ export function bobaFunc() {
     const radius = Math.random() * 60 + 30
     bobas.push(new Boba(radius, position, vector))
   }
-
   // const tool = new paper.Tool()
   // tool.onMouseMove = (event) => event.point
   // console.log(tool.onMouseMove);

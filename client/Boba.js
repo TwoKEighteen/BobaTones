@@ -4,15 +4,15 @@ import {Dropdown} from 'semantic-ui-react'
 import {bobaFunc, stopAudio, musicStart} from './shape.js'
 
 class BobaCanvas extends Component {
+  componentDidMount() {
+    bobaFunc()
+  }
   handleChange(event, data) {
     const keyStuff = data.value
     stopAudio()
     setTimeout(() => {
       musicStart(keyStuff)
     }, 1500)
-  }
-  componentDidMount() {
-    bobaFunc()
   }
   render() {
     return (
@@ -28,15 +28,27 @@ class BobaCanvas extends Component {
             {key: 'happy', value: 'happy', text: 'Bensound Buddy'}
           ]}
         />
-        <canvas id="myCanvas" resize="true" />
+        <a-scene>
+          <canvas id="myCanvas" resize="true" />
+          <a-assets>
+            <img
+              id="groundTexture"
+              src="https://cdn.aframe.io/a-painter/images/floor.jpg"
+            />
+            <img id="llama" src="/llama.gif" />
+          </a-assets>
+          <a-box position="-1 0.5 -3" rotation="0 45 0" background="#4CC3D9" />
+          <a-plane src="#llama" rotation="0 0 0" width="30" height="30" />
+          <a-plane
+            src="#groundTexture"
+            rotation="-90 0 0"
+            width="30"
+            height="30"
+          />
+        </a-scene>
       </div>
     )
   }
 }
 
 export default BobaCanvas
-
-// <div>
-//   <button>Play Appegiator</button>
-//   <button>Play Music</button>
-// </div>
